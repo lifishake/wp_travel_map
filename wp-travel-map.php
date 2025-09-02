@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('WP_TRAVEL_MAP_VERSION', '1.0.3');
+define('WP_TRAVEL_MAP_VERSION', '1.0.3-dazhi-0.1');
 define('WP_TRAVEL_MAP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WP_TRAVEL_MAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -180,8 +180,7 @@ class WPTravelMap {
         $table_name = $wpdb->prefix . 'travel_locations';
         
         $name = sanitize_text_field($_POST['name']);
-        $description = str_replace(array("\"", "\'"), array('"', "'"), $_POST['description']);
-        $description = esc_html($description);
+        $description = sanitize_textarea_field($_POST['description']);
         $latitude = floatval($_POST['latitude']);
         $longitude = floatval($_POST['longitude']);
         $visit_date = sanitize_text_field($_POST['visit_date']);
@@ -289,13 +288,12 @@ class WPTravelMap {
                 $error_count++;
                 continue;
             }
-            $description = str_replace(array("\"", "\'"), array('"', "'"), $location['description']);
-            $description = esc_html($description);
+            
             $result = $wpdb->insert(
                 $table_name,
                 array(
                     'name' => sanitize_text_field($location['name']),
-                    'description' => $description,
+                    'description' => sanitize_textarea_field($location['description'] ?? ''),
                     'latitude' => floatval($location['latitude']),
                     'longitude' => floatval($location['longitude']),
                     'visit_date' => sanitize_text_field($location['visit_date'] ?? '')

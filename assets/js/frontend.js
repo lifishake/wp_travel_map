@@ -116,7 +116,7 @@ jQuery(document).ready(function($) {
             }
             
             if (location.description) {
-                const descriptionWithLinks = unEntity(location.description);
+                const descriptionWithLinks = makeLinksClickableEx(escapeHtml(location.description));
                 popupContent += '<p class="wptm-popup-description">' + descriptionWithLinks + '</p>';
             }
             
@@ -162,11 +162,6 @@ jQuery(document).ready(function($) {
         $mapContainer.append(legend);
     }
     
-	
-	function unEntity(str){
-   return str.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#039;/g, "'");
-}
-	
     function escapeHtml(text) {
         const map = {
             '&': '&amp;',
@@ -180,7 +175,6 @@ jQuery(document).ready(function($) {
     
     function makeLinksClickable(text) {
         if (!text) return '';
-        
         // URL正则表达式，匹配http/https链接
         const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
         
@@ -192,7 +186,29 @@ jQuery(document).ready(function($) {
             return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="wptm-link">${cleanUrl}</a>${punctuation}`;
         });
     }
-    
+    function makeLinksClickableEx(text) {
+        if (!text) return '';
+		if (text.startsWith("[[") && text.endsWith("]]")) {
+			const clearFull = text.replace("[[", "").replace("]]", "");
+			const arrResult = clearFull.split("|");
+			if (2 == arrResult.length) {
+				return `<a href="${arrResult[0]}" target="_blank" rel="noopener noreferrer" class="wptm-link">${arrResult[1]}</a>`;
+			}
+			else {
+				return clearFull;
+			}
+		}
+        // URL正则表达式，匹配http/https链接
+		const urlRegex = /(https?:\/\/[^\s<>"']+)/gi;
+	
+		return text.replace(urlRegex, function(url) {
+		// 移除末尾的标点符号
+			const cleanUrl = url.replace(/[.,;:!?]+$/, '');
+			const punctuation = url.substr(cleanUrl.length);
+		
+			return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="wptm-link">${cleanUrl}</a>${punctuation}`;
+		});
+    }
     map.on('load', function() {
         loadLocations();
     });
