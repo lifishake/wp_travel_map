@@ -116,7 +116,7 @@ jQuery(document).ready(function($) {
             }
             
             if (location.description) {
-                const descriptionWithLinks = makeLinksClickable(escapeHtml(location.description));
+                const descriptionWithLinks = unEntity(location.description);
                 popupContent += '<p class="wptm-popup-description">' + descriptionWithLinks + '</p>';
             }
             
@@ -162,6 +162,11 @@ jQuery(document).ready(function($) {
         $mapContainer.append(legend);
     }
     
+	
+	function unEntity(str){
+   return str.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&#039;/g, "'");
+}
+	
     function escapeHtml(text) {
         const map = {
             '&': '&amp;',

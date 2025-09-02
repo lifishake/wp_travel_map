@@ -180,7 +180,8 @@ class WPTravelMap {
         $table_name = $wpdb->prefix . 'travel_locations';
         
         $name = sanitize_text_field($_POST['name']);
-        $description = sanitize_textarea_field($_POST['description']);
+        $description = str_replace(array("\"", "\'"), array('"', "'"), $_POST['description']);
+        $description = esc_html($description);
         $latitude = floatval($_POST['latitude']);
         $longitude = floatval($_POST['longitude']);
         $visit_date = sanitize_text_field($_POST['visit_date']);
@@ -288,12 +289,13 @@ class WPTravelMap {
                 $error_count++;
                 continue;
             }
-            
+            $description = str_replace(array("\"", "\'"), array('"', "'"), $location['description']);
+            $description = esc_html($description);
             $result = $wpdb->insert(
                 $table_name,
                 array(
                     'name' => sanitize_text_field($location['name']),
-                    'description' => sanitize_textarea_field($location['description'] ?? ''),
+                    'description' => $description,
                     'latitude' => floatval($location['latitude']),
                     'longitude' => floatval($location['longitude']),
                     'visit_date' => sanitize_text_field($location['visit_date'] ?? '')
